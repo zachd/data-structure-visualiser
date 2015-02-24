@@ -33,6 +33,37 @@ public class Visualiser {
 		writeToFile(l);
 	}
 	
+	//handles array implementations of binary trees
+	public void visualiseTree(int[] treeArray){
+		JSONObject binaryTree = new JSONObject();
+		binaryTree.put("type", "BINARY-TREE");
+		JSONObject head = treeToJSON(treeArray, 1);
+		binaryTree.put("head", head);
+		writeToFile(binaryTree);
+	}
+	
+	//recursive function which builds the tree in JSON
+	private JSONObject treeToJSON(int[] treeArray, int k){
+		if(k >= treeArray.length){
+			return null;
+		}
+		JSONObject node = new JSONObject();
+		node.put("type", "NODE");
+		node.put("value", treeArray[k]);
+		
+		JSONArray children = new JSONArray();
+		JSONObject leftChild = treeToJSON(treeArray, 2*k);
+		JSONObject rightChild = treeToJSON(treeArray, (2*k)+1);
+		
+		if(leftChild != null)
+			children.add(leftChild);
+		if(rightChild != null)
+			children.add(rightChild);
+		
+		node.put("children", children);	
+		return node;
+	}
+	
 	//takes a 1D array and returns it as a json object
 	private JSONObject listToJSON(int[] list){
 		JSONObject listObject = new JSONObject();
