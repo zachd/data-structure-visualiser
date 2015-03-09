@@ -1,10 +1,11 @@
 var dataset;
-
+var current;
 // Load JSON from file
 d3.json("test.json", function(error, json) {
   if (error) return console.warn(error);
   dataset = json
-  visualise(1);
+  current = 0;
+  visualise(0);
 });
 
 // Dimension variables
@@ -52,4 +53,12 @@ function visualise(num){
             .attr("y", text_padding.y)
             .text(function(d) { return d.value; });
     }
+}
+
+function next(){
+  visualise(++current);
+}
+
+function previous(){
+  visualise(--current);
 }
