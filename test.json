@@ -4,10 +4,12 @@
       "type": "ARRAY",
       "data": [
         {
-          "value": "212 555-1234"
+          "value": "212 555-1234",
+          "highlighted": false
         },
         {
-          "value": "646 555-4567"
+          "value": "646 555-4567",
+          "highlighted": true
         }
       ]
     },
@@ -15,13 +17,16 @@
       "type": "ARRAY",
       "data": [
         {
-          "value": "111 555-7890"
+          "value": "111 555-7890",
+          "highlighted": false
         },
         {
-          "value": "222 555-9876"
+          "value": "222 555-9876",
+          "highlighted": false
         },
         {
-          "value": "333 555-1234"
+          "value": "333 555-1234",
+          "highlighted": true
         }
       ]
     },

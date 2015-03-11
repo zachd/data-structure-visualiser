@@ -16,6 +16,9 @@ var text_padding = {x: 10, y:10};
 var width = 500;
 var height =250;
 var myInterval;
+var highlightedColor = d3.rgb("rgb(255,247,0 )")
+var defaultColor = d3.rgb("rgb(135,206,235)")
+var textColor = d3.rgb("rgb(0,0,0")
 
 //Create SVG container
 var svg = d3.select("#canvas")
@@ -41,6 +44,7 @@ function visualise(num){
         elem.append("rect")
             .attr("width", box_size.w)
             .attr("height", box_size.h)
+            .attr("fill", function(d) { return (d.highlighted) ? highlightedColor : defaultColor;})
             .attr("x", function(d, i){
                 return (i * box_size.w + 
                     (i > 0 ? i * array_padding : 0));})
@@ -50,7 +54,7 @@ function visualise(num){
             .attr("x", function(d) { return 100; })
             .attr("y", 10 / 2)
             .attr("dy", ".35em")
-            .attr("fill", "white")
+            .attr("fill", textColor)
             .attr("x", function(d, i){
                 return (i * box_size.w + text_padding.x + 
                     (i > 0 ? i * array_padding : 0));})
@@ -131,8 +135,12 @@ function play(){
 function reset(){
   //reset current to the first snapshot
   current = 0;
+  
+  //enable/disable relevant buttons
   d3.selectAll(".pagination").attr("disabled", null);
   d3.select("#previous").attr("disabled", "disabled");
+  
+  //visualise first snapshot
   visualise(current);
 }
 
