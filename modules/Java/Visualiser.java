@@ -1,45 +1,50 @@
-import java.awt.List;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Array;
+import java.nio.file.FileSystems;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 
 public class Visualiser {
+	
+	/* Begin File Writer */
 	FileWriter writer;
 	public static final int DEFAULT_HIGHTLIGHTED_INDEX = -1;
+	public static JSONObject output_object = new JSONObject();
+	public static JSONArray snapshots = new JSONArray();
 	public Visualiser(String directory){
 		try {
-			writer = new FileWriter(directory);
+			writer = new FileWriter(directory + FileSystems.getDefault().getSeparator() + "output.json");
+			output_object.put("snapshots", snapshots);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	//handles 2D arrays
-	public void visualise(int[][] array, int[]... highlightedIndices){
+	/* 2D Arrays Visualiser */
+	public void visualise2d(Object array, int[]... highlightedIndices){
 		JSONObject a = new JSONObject();
 		JSONArray data = new JSONArray();
-		for(int i = 0; i < array.length ; i++){
+		for(int i = 0; i < Array.getLength(array) ; i++){
 			int[] index = findRow(highlightedIndices, i);
-			data.add(listToJSON(array[i], index));
+			data.add(listToJSON(Array.get(array, i), index));
 		}
+		a.put("type", "2D-ARRAY");
 		a.put("data", data);
-		writeToFile(a);
+		snapshots.add(a);
 	}
 	
-	public void visualise(int[][] array){
-		int[] defaultCoord = {DEFAULT_HIGHTLIGHTED_INDEX,DEFAULT_HIGHTLIGHTED_INDEX};
+	public void visualise2d(Object array){
+		int[] defaultCoord = {DEFAULT_HIGHTLIGHTED_INDEX, DEFAULT_HIGHTLIGHTED_INDEX};
 		int[][] list = {defaultCoord};
-		visualise(array, list);
+		visualise2d(array, list);
 	}
 	
-	//goes through the list of coords, if a coord has the row in question, the col value is put in the array,
-	//otherwise the default value is added
+	/* Helper function for 2D Array Visualiser */
+	// goes through the list of coords, if a coord has the row in question, 
+	// the col value is put in the array, otherwise the default value is added
 	int[] findRow(int[][] listOfCoords, int rowToFind){
 		int[] colIndices = new int[listOfCoords.length];
 		for(int i = 0; i < listOfCoords.length; i++)
@@ -47,23 +52,24 @@ public class Visualiser {
 		return colIndices;
 	}
 	
-	//handles 1D arrays
-	public void visualise(int[] list, int... highlightedIndices){
-		JSONObject l = listToJSON(list, highlightedIndices);
-		writeToFile(l);
+	/* 1D Arrays Visualiser */
+	public void visualise(Object array, int... highlightedIndices){
+		JSONObject obj = listToJSON(array, highlightedIndices);
+		obj.put("type", "ARRAY");
+		snapshots.add(obj);
 	}
 	
-	public void visualise(int[] list){
-		visualise(list, DEFAULT_HIGHTLIGHTED_INDEX);
+	public void visualise(Object array){
+		visualise(array, DEFAULT_HIGHTLIGHTED_INDEX);
 	}
 	
-	//handles array implementations of binary trees
-	public void visualiseTree(int[] treeArray, int... highlightedIndices){
+	/* Binary Tree Visualiser */
+	public void visualiseTree(Object treeArray, int... highlightedIndices){
 		JSONObject binaryTree = new JSONObject();
 		binaryTree.put("type", "BINARY-TREE");
 		JSONObject head = treeToJSON(treeArray, 1, highlightedIndices);
-		binaryTree.put("head", head);
-		writeToFile(binaryTree);
+		binaryTree.put("data", head);
+		snapshots.add(binaryTree);
 	}
 	
 	public void visualiseTree(int[] treeArray){
@@ -71,13 +77,13 @@ public class Visualiser {
 	}
 	
 	//recursive function which builds the tree in JSON
-	private JSONObject treeToJSON(int[] treeArray, int k, int[] highlightedIndices){
-		if(k >= treeArray.length){
+	private JSONObject treeToJSON(Object treeArray, int k, int[] highlightedIndices){
+		if(k >= Array.getLength(treeArray)){
 			return null;
 		}
 		JSONObject node = new JSONObject();
 		node.put("type", "NODE");
-		node.put("value", treeArray[k]);
+		node.put("value", Array.get(treeArray, k));
 		
 		JSONArray children = new JSONArray();
 		JSONObject leftChild = treeToJSON(treeArray, 2*k, highlightedIndices);
@@ -94,22 +100,24 @@ public class Visualiser {
 		return node;
 	}
 	
-	//takes a 1D array and returns it as a json object
-	private JSONObject listToJSON(int[] list, int[] highlightedIndices){
+	/* Helper function for all Array Visualisers */
+	private JSONObject listToJSON(Object array, int[] highlightedIndices){
+
 		JSONObject listObject = new JSONObject();
 		JSONArray data = new JSONArray();
-		for(int i = 0; i < list.length; i++){
+		for(int i = 0; i < Array.getLength(array); i++){
 			JSONObject element = new JSONObject();
 			boolean highlighted = contains(highlightedIndices, i);
 			element.put("type", "ELEMENT");
-			element.put("value", list[i]);
+			element.put("value", Array.get(array, i));
 			element.put("highlighted", highlighted);
 			data.add(element);
 		}
 		listObject.put("data", data);
 		return listObject;
 	}
-	//built in functions were doing weird things so i wrote my own
+	
+	/* Helper function for all Array Visualisers */
 	private boolean contains(int[] array, int value){
 		for(int i = 0; i < array.length; i++){
 			if(array[i] == value){
@@ -119,7 +127,7 @@ public class Visualiser {
 		return false;
 	}
 	
-	//takes a JSON object and writes it to a visualiser's file
+	/* Write JSON Object to File */
 	private void writeToFile(JSONObject object){
 		try {
 			writer.write(object.toJSONString());
@@ -129,12 +137,12 @@ public class Visualiser {
 		}
 	}
 	
-	//closes the visualiser's file writer
-	public void endVisualisation(){
+	/* End File Writer and push changes to disk */
+	public void flush(){
 		try {
+			writeToFile(output_object);
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -102,8 +102,7 @@ function visualise(num){
           .attr("text-anchor", function(d) { return d.children ? "end" : "start"; })
           .text(function(d) { return d.value; });
         
-        d3.select(self.frameElement).style("height", height + "px");
-      break;
+        break;
     }
 }
 
