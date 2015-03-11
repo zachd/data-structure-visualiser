@@ -1,23 +1,26 @@
 var dataset;
 var current;
+
 // Load JSON from file
 d3.json("test.json", function(error, json) {
   if (error) return console.warn(error);
   dataset = json
-  current = 0;
-  visualise(0);
+  current = -1;
+  next(true);
 });
 
 // Dimension variables
 var box_size = {w: 110, h:50};
 var array_padding = 10;
 var text_padding = {x: 10, y:10};
+var width = 500;
+var height =250;
 
 //Create SVG container
-var svg = d3.select("body")
+var svg = d3.select("#canvas")
       .append("svg")
-      .attr("width", 500)
-      .attr("height", 500);
+      .attr("width", width)
+      .attr("height", height);
 
 // Visualise array function
 function visualise(num){
@@ -26,8 +29,8 @@ function visualise(num){
     svg.selectAll("*").remove();
     
     // Check if the snapshot is of type ARRAY
-    if(dataset.snapshots[num].type === "ARRAY"){
-        
+    switch (dataset.snapshots[num].type) {
+      case "ARRAY":
         // Create SVG grouping element for each data item
         var elem = svg.selectAll("g")
             .data(dataset.snapshots[num].data)
@@ -52,13 +55,65 @@ function visualise(num){
                     (i > 0 ? i * array_padding : 0));})
             .attr("y", text_padding.y)
             .text(function(d) { return d.value; });
+      break;
+      case "BINARY-TREE":
+        
+        // Initialise tree variables
+        var tree = d3.layout.tree()
+          .size([height, width - 160]);
+        var diagonal = d3.svg.diagonal()
+          .projection(function(d) { return [d.y, d.x]; });
+        var treecontainer = svg.append("g")
+          .attr("transform", "translate(40,0)");
+        
+        // Initialise tree nodes and links from data set
+        var nodes = tree.nodes(dataset.snapshots[num].data),
+          links = tree.links(nodes);
+
+        // Create link elements from link array
+        var link = treecontainer.selectAll("path.link")
+          .data(links)
+          .enter().append("path")
+          .attr("class", "link")
+          .attr("d", diagonal);
+        
+        // Create node elements from nodes array
+        var node = treecontainer.selectAll("g.node")
+          .data(nodes)
+          .enter().append("g")
+          .attr("class", "node")
+          .attr("transform", function(d) { 
+            return "translate(" + d.y + "," + d.x + ")"; 
+          })
+
+        // Add circle with radius 4.5 to node elements
+        node.append("circle")
+          .attr("r", 4.5);
+
+        // Add text to node elements
+        node.append("text")
+          .attr("dx", function(d) { return d.children ? -8 : 8; })
+          .attr("dy", 3)
+          .attr("text-anchor", function(d) { return d.children ? "end" : "start"; })
+          .text(function(d) { return d.value; });
+        
+        d3.select(self.frameElement).style("height", height + "px");
+      break;
     }
 }
 
-function next(){
-  visualise(++current);
+function next(forward){
+  // Change current counter to desired number
+  current = current + (forward ? 1 : -1);
+  
+  // Disable buttons if at the end of the snapshots array
+  d3.selectAll(".pagination").attr("disabled", null);
+  if(current == dataset.snapshots.length - 1)
+    d3.select("#next").attr("disabled", "disabled");
+  else if(current == 0)
+    d3.select("#previous").attr("disabled", "disabled");
+  
+  // Visualise desired number
+  visualise(current);
 }
 
-function previous(){
-  visualise(--current);
-}
