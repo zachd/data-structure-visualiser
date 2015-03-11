@@ -15,6 +15,7 @@ var array_padding = 10;
 var text_padding = {x: 10, y:10};
 var width = 500;
 var height =250;
+var myInterval;
 
 //Create SVG container
 var svg = d3.select("#canvas")
@@ -107,12 +108,34 @@ function next(forward){
   
   // Disable buttons if at the end of the snapshots array
   d3.selectAll(".pagination").attr("disabled", null);
-  if(current == dataset.snapshots.length - 1)
+  if(current == dataset.snapshots.length - 1){
     d3.select("#next").attr("disabled", "disabled");
+    d3.select("#play").attr("disabled", "disabled");
+    stopInterval();
+  }
   else if(current == 0)
     d3.select("#previous").attr("disabled", "disabled");
   
   // Visualise desired number
   visualise(current);
+}
+
+function play(){
+  //get the speed from the input slider
+  speed = d3.select("#speed").property("value");
+  //call next with the desired interval
+  myInterval = setInterval(function () {next(true)}, 100*speed);
+}
+
+function reset(){
+  //reset current to the first snapshot
+  current = 0;
+  d3.selectAll(".pagination").attr("disabled", null);
+  d3.select("#previous").attr("disabled", "disabled");
+  visualise(current);
+}
+
+function stopInterval(){
+  clearInterval(myInterval);
 }
 
