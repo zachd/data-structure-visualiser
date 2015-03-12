@@ -2,7 +2,7 @@ var dataset;
 var current;
 
 // Load JSON from file
-d3.json("test.json", function(error, json) {
+d3.json("quicksort.json", function(error, json) {
   if (error) return console.warn(error);
   dataset = json
   current = -1;
@@ -13,12 +13,14 @@ d3.json("test.json", function(error, json) {
 var box_size = {w: 110, h:50};
 var array_padding = 10;
 var text_padding = {x: 10, y:10};
-var width = 500;
+var width = 1900;
 var height =250;
 var myInterval;
-var highlightedColor = d3.rgb("rgb(255,247,0 )")
-var defaultColor = d3.rgb("rgb(135,206,235)")
-var textColor = d3.rgb("rgb(0,0,0")
+var highlightedColor = d3.rgb("rgb(255,247,0 )");
+var defaultColor = d3.rgb("rgb(135,206,235)");
+var orange = d3.rgb("rgb(250,198,85)");
+var textColor = d3.rgb("rgb(0,0,0");
+var weightedColors = false;
 
 //Create SVG container
 var svg = d3.select("#canvas")
@@ -40,11 +42,16 @@ function visualise(num){
             .data(dataset.snapshots[num].data)
             .enter().append("g");
         
+        if(weightedColors)
+          range = getRange(dataset.snapshots[num].data);
+        else
+          range = [0,0]
+          
         // Add rectangular box to group
         elem.append("rect")
             .attr("width", box_size.w)
             .attr("height", box_size.h)
-            .attr("fill", function(d) { return (d.highlighted) ? highlightedColor : defaultColor;})
+            .attr("fill", function(d) { return (d.highlighted) ? highlightedColor : getColor(d, range);})
             .attr("x", function(d, i){
                 return (i * box_size.w + 
                     (i > 0 ? i * array_padding : 0));})
@@ -145,5 +152,36 @@ function reset(){
 
 function stopInterval(){
   clearInterval(myInterval);
+}
+
+
+
+function getColor(d, range){
+  if (!weightedColors)
+    return defaultColor;
+  else {
+    c = d3.scale.linear().domain([range[0],range[1]]).range([defaultColor, orange]);
+    return c(d.value);
+  }
+}
+function getRange(data) {
+  min = Infinity;
+  max = -Infinity;
+  for(i = 0; i < data.length; i++){
+    if(data[i].value > max)
+      max = data[i].value;
+    if(data[i].value < min)
+      min = data[i].value;
+  }  
+  return [min, max]
+}
+
+function toggleWeightedColors(){
+  weightedColors = !weightedColors;
+  if(weightedColors)
+    d3.select("#colors").text("Turn off weighted colors");
+  else
+    d3.select("#colors").text("Turn on weighted colors");
+  visualise(current);
 }
 
