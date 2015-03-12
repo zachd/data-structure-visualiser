@@ -10,10 +10,12 @@ visualiser = Visualiser(directory, "output.json");
 # Two dummy arrays to test String and Int output
 stringarray = ["ABC", "DEF", "GHI"];
 intarray = [1, 2, 3, 4, 5, 6, 7, 8];
+twodarray = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 0]];
 
 # Visualise both arrays
 visualiser.visualise(intarray);
 visualiser.visualise(stringarray);
+visualiser.visualise(twodarray);
 
 # Finish writing and flush output
 visualiser.flush();

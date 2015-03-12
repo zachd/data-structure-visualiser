@@ -18,7 +18,7 @@ class Visualiser:
     };
 
     for i in range(0, len(array)):
-      highlighted_row = filter(lambda tuple: tuple[0] == i, highlighted);
+      highlighted_row = [x[0] for x in filter(lambda t: t[0] == i, highlighted)];
       data.append(listToJSON(array[i], highlighted_row));
 
     self.json_data["snapshots"].append(data);
