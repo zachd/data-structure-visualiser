@@ -10,10 +10,10 @@ d3.json("quicksort.json", function(error, json) {
 });
 
 // Dimension variables
-var box_size = {w: 110, h:50};
-var array_padding = 10;
-var text_padding = {x: 10, y:10};
-var width = 1900;
+var box_size = {w: 50, h:50};
+var array_padding = 8;
+var text_padding = {x: 8, y:8};
+var width = 1240;
 var height =250;
 var myInterval;
 var highlightedColor = d3.rgb("rgb(255,247,0 )");
@@ -58,7 +58,7 @@ function visualise(num){
         
         // Add text to group
         elem.append("text")
-            .attr("dy", ".75em")
+            .attr("dy", "1em")
             .attr("fill", textColor)
             .attr("x", function(d, i){
                 return (i * box_size.w + text_padding.x + 
@@ -66,7 +66,8 @@ function visualise(num){
             .attr("y", text_padding.y)
             .text(function(d) { return d.value; })
             .attr("font-family", "sans-serif")
-            .attr("font-size", "30px");
+            .attr("font-size", "25px");
+            
       break;
       case "BINARY-TREE":
         
