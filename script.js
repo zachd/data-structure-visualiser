@@ -5,17 +5,18 @@ var current;
 d3.json("quicksort.json", function(error, json) {
   if (error) return console.warn(error);
   dataset = json
-  console.log(dataset["snapshots"].length);
+  d3.select("#snapshot-slider").attr("max", dataset["snapshots"].length - 1);
   current = -1;
   next(true);
 });
 
 // Dimension variables
-var box_size = {w: 80, h:50};
+var box_size = {w: 70, h:50};
 var array_padding = 8;
 var text_padding = {x: 8, y:8};
 var width = 500;
 var height = 250;
+var playing = false;
 var myInterval;
 
 // Color variables
@@ -30,11 +31,19 @@ var svg = d3.select("#canvas")
       .attr("width", width)
       .attr("height", height);
 
+
 // Visualise array function
 function visualise(num){
     
     // Remove all SVG elements from container
     svg.selectAll("*").remove();
+    
+    // Show snapshot number in corner
+    d3.select("#snapshot-counter")
+      .text("snapshot: " + num);
+    
+    // Update snapshot progress slider
+    d3.select("#snapshot-slider").property("value", num);
   
     // Check if the snapshot is of type ARRAY
     switch (dataset.snapshots[num].type) {
@@ -75,6 +84,9 @@ function visualise(num){
         elem.append("text")
             .attr("dy", box_size.h / 2 + array_padding)
             .attr("dx", box_size.w / 2)
+            .attr("style", function(d){
+              return d.highlighted ? "font-weight: bold" : null;
+            })
             .attr("fill", textColor)
             .attr("text-anchor", "middle")
             .text(function(d) { return d.value; });
@@ -130,10 +142,11 @@ function next(forward){
   current = current + (forward ? 1 : -1);
   
   // Disable buttons if at the end of the snapshots array
-  d3.selectAll(".pagination").attr("disabled", null);
-  if(current == dataset.snapshots.length - 1){
+  d3.selectAll(".direction").attr("disabled", null);
+  if(current >= dataset.snapshots.length - 1){
     d3.select("#next").attr("disabled", "disabled");
-    d3.select("#play").attr("disabled", "disabled");
+    d3.select("#play").html("<b>&#8634;</b>");
+    playing = false;
     stopInterval();
   }
   else if(current == 0)
@@ -144,18 +157,40 @@ function next(forward){
 }
 
 function play(){
+  if(current >= dataset.snapshots.length - 1)
+    reset();
+  
+  // set playing button value
+  d3.select("#play").html(!playing ? "&#9646;&#9646;" : "&#9654;");
+  
   //get the speed from the input slider
   speed = d3.select("#speed").property("value");
+  
   //call next with the desired interval
-  myInterval = setInterval(function () {next(true)}, speed);
+  if(!playing && current != dataset.snapshots.length - 1)
+    myInterval = setInterval(function () {next(true)}, speed);
+  else
+    stopInterval();
+  
+  playing = !playing;
+}
+
+function changeSpeed(speed){
+  stopInterval();
+  if(playing && current != dataset.snapshots.length - 1)
+    myInterval = setInterval(function () {next(true)}, speed);
+  d3.select("#speed-value").html(speed + "ms");
 }
 
 function reset(){
   //reset current to the first snapshot
   current = 0;
+  playing = false;
+  stopInterval();
   
   //enable/disable relevant buttons
-  d3.selectAll(".pagination").attr("disabled", null);
+  d3.select("#play").html("&#9654;");
+  d3.selectAll(".direction").attr("disabled", null);
   d3.select("#previous").attr("disabled", "disabled");
   
   //visualise first snapshot
@@ -165,8 +200,6 @@ function reset(){
 function stopInterval(){
   clearInterval(myInterval);
 }
-
-
 
 function getColor(d, range){
   if (!weightedColors)
@@ -197,3 +230,7 @@ function toggleWeightedColors(){
   visualise(current);
 }
 
+function sliderMove(slider){
+  current = +slider.value;
+  visualise(slider.value);
+}
