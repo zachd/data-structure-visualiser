@@ -95,8 +95,8 @@ public class Visualiser {
 			children.add(rightChild);
 		
 		boolean highlighted = contains(highlightedIndices, k);
-		node.put("children", children);	
 		node.put("highlighted", highlighted);
+		node.put("children", children);	
 		return node;
 	}
 	
