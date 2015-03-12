@@ -10,13 +10,15 @@ d3.json("quicksort.json", function(error, json) {
 });
 
 // Dimension variables
-var box_size = {w: 110, h:50};
+var box_size = {w: 80, h:50};
 var array_padding = 10;
 var text_padding = {x: 10, y:10};
 var width = 1900;
-var height =250;
+var height = 250;
 var myInterval;
-var highlightedColor = d3.rgb("rgb(255,247,0 )");
+
+// Color variables
+var highlightedColor = d3.rgb("rgb(180,180,180 )");
 var defaultColor = d3.rgb("rgb(135,206,235)");
 var orange = d3.rgb("rgb(250,198,85)");
 var textColor = d3.rgb("rgb(255,255,255)");
@@ -33,40 +35,41 @@ function visualise(num){
     
     // Remove all SVG elements from container
     svg.selectAll("*").remove();
-    
+  
     // Check if the snapshot is of type ARRAY
     switch (dataset.snapshots[num].type) {
       case "ARRAY":
+        
         // Create SVG grouping element for each data item
         var elem = svg.selectAll("g")
             .data(dataset.snapshots[num].data)
-            .enter().append("g");
+            .enter().append("g")
+            .attr("class", "array-node")
+            .attr("transform", function(d, i) { 
+              return "translate(" + i * (box_size.w +array_padding) + "," + array_padding + ")"; 
+            });
         
+        // Set range for weighted colors
         if(weightedColors)
           range = getRange(dataset.snapshots[num].data);
         else
           range = [0,0]
         
-        // Add rectangular box to group
+        // Add main box to group
         elem.append("rect")
             .attr("width", box_size.w)
             .attr("height", box_size.h)
-            .attr("fill", function(d) { return (d.highlighted) ? highlightedColor : getColor(d, range);})
-            .attr("x", function(d, i){
-                return (i * box_size.w + 
-                    (i > 0 ? i * array_padding : 0));})
+            .attr("fill", function(d) { 
+              return getColor(d, range);
+            });
         
         // Add text to group
         elem.append("text")
-            .attr("dy", ".75em")
+            .attr("dy", box_size.h / 2 + array_padding)
+            .attr("dx", box_size.w / 2)
             .attr("fill", textColor)
-            .attr("x", function(d, i){
-                return (i * box_size.w + text_padding.x + 
-                    (i > 0 ? i * array_padding : 0));})
-            .attr("y", text_padding.y)
-            .text(function(d) { return d.value; })
-            .attr("font-family", "sans-serif")
-            .attr("font-size", "30px");
+            .attr("text-anchor", "middle")
+            .text(function(d) { return d.value; });
       break;
       case "BINARY-TREE":
         
@@ -90,10 +93,10 @@ function visualise(num){
           .attr("d", diagonal);
         
         // Create node elements from nodes array
-        var node = treecontainer.selectAll("g.node")
+        var node = treecontainer.selectAll("g.tree-node")
           .data(nodes)
           .enter().append("g")
-          .attr("class", "node")
+          .attr("class", "tree-node")
           .attr("transform", function(d) { 
             return "translate(" + d.y + "," + d.x + ")"; 
           })
