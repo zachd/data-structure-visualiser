@@ -69,6 +69,6 @@ class Visualiser:
 
     return data;
 
-  def flush(self):
+  def end(self):
     with open(os.path.join(self.directory, self.filename), 'w') as outfile:
       json.dump(self.json_data, outfile);

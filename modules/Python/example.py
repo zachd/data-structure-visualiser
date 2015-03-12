@@ -18,4 +18,4 @@ visualiser.visualise(stringarray);
 visualiser.visualise(twodarray);
 
 # Finish writing and flush output
-visualiser.flush();
+visualiser.end();
