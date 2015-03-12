@@ -19,8 +19,8 @@ var height = 250;
 var myInterval;
 
 // Color variables
-var defaultColor = d3.rgb("rgb(135,206,235)");
-var orange = d3.rgb("rgb(250,198,85)");
+var defaultColor = d3.rgb("rgb(41,182,246)");
+var orange = d3.rgb("rgb(255,167,38)");
 var textColor = d3.rgb("rgb(255,255,255)");
 var weightedColors = false;
 
