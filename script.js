@@ -10,11 +10,11 @@ d3.json("quicksort.json", function(error, json) {
 });
 
 // Dimension variables
-var box_size = {w: 80, h:50};
-var array_padding = 10;
-var text_padding = {x: 10, y:10};
-var width = 1900;
-var height = 250;
+var box_size = {w: 50, h:50};
+var array_padding = 8;
+var text_padding = {x: 8, y:8};
+var width = 1240;
+var height =250;
 var myInterval;
 
 // Color variables
