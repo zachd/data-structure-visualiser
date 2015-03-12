@@ -19,7 +19,7 @@ var myInterval;
 var highlightedColor = d3.rgb("rgb(255,247,0 )");
 var defaultColor = d3.rgb("rgb(135,206,235)");
 var orange = d3.rgb("rgb(250,198,85)");
-var textColor = d3.rgb("rgb(0,0,0");
+var textColor = d3.rgb("rgb(255,255,255)");
 var weightedColors = false;
 
 //Create SVG container
@@ -46,7 +46,7 @@ function visualise(num){
           range = getRange(dataset.snapshots[num].data);
         else
           range = [0,0]
-          
+        
         // Add rectangular box to group
         elem.append("rect")
             .attr("width", box_size.w)
@@ -58,15 +58,15 @@ function visualise(num){
         
         // Add text to group
         elem.append("text")
-            .attr("x", function(d) { return 100; })
-            .attr("y", 10 / 2)
-            .attr("dy", ".35em")
+            .attr("dy", ".75em")
             .attr("fill", textColor)
             .attr("x", function(d, i){
                 return (i * box_size.w + text_padding.x + 
                     (i > 0 ? i * array_padding : 0));})
             .attr("y", text_padding.y)
-            .text(function(d) { return d.value; });
+            .text(function(d) { return d.value; })
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "30px");
       break;
       case "BINARY-TREE":
         
@@ -135,7 +135,7 @@ function play(){
   //get the speed from the input slider
   speed = d3.select("#speed").property("value");
   //call next with the desired interval
-  myInterval = setInterval(function () {next(true)}, 100*speed);
+  myInterval = setInterval(function () {next(true)}, speed);
 }
 
 function reset(){
