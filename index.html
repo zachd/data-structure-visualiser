@@ -2,11 +2,18 @@
 <html>
 <head>
   <title>Data Structure Visualiser</title>
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
   <script type= "text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
   <style>
     * {
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    h1 {
+      margin: 8px;
+    }
+    #canvas {
+      overflow-x: auto;
     }
 	.node circle {
 	  fill: #fff;
@@ -19,22 +26,58 @@
 	.array-node {
 	  font-size: 25px;
 	}
+    .array-node .highlighted {
+      stroke: #B4B4B4;
+      stroke-width: 5;  
+    }
 	.link {
 	  fill: none;
 	  stroke: #ccc;
 	  stroke-width: 1.5px;
 	}
+    /* Slider CSS http://cssscript.com/simple-flat-html5-and-css3-range-slider/ */
+    input {
+      -webkit-appearance: none;
+      width: 160px;
+      height: 20px;
+      margin: 10px 50px;
+      background: linear-gradient(to right, #E6E6E6 0%, #E6E6E6 100%);
+      background-size: 150px 5px;
+      background-position: center;
+      background-repeat: no-repeat;
+      overflow: hidden;
+      outline: none;
+      margin: 5px;
+    }
+    input::-webkit-slider-thumb {
+       -webkit-appearance: none;
+       width: 10px;
+       height: 20px;
+       background: #AAA;
+       position: relative;
+       z-index: 3;
+    }
+    input::-webkit-slider-thumb:after {
+     content: " ";
+     width: 160px;
+     height: 8px;
+     position: absolute;
+     z-index: 1;
+     right:10px;
+     top: 6px;
+     background: #AAA;
+    }
   </style>
 </head>
 <body>
   <h1>Data Structure Visualiser</h1>
   <div id="canvas"></div>
-  <button onclick = "next(false)" id="previous" class="pagination">Previous</button>
-  <button onclick = "next(true)" id="next" class="pagination">Next</button>
-  <button onclick = "play()" id="play" class="pagination">Play</button>
-  <button onclick = "stopInterval()" id="pause" class="pagination">Pause</button>
-  <button onclick = "reset()" id="reset" class="pagination">Reset</button>
-  <button onclick = "toggleWeightedColors()" id="colors" class="pagination">Turn on weighted colors</button>
+  <button onclick = "next(false)" id="previous" class="pure-button">Previous</button>
+  <button onclick = "next(true)" id="next" class="pure-button">Next</button>
+  <button onclick = "play()" id="play" class="pure-button">Play</button>
+  <button onclick = "stopInterval()" id="pause" class="pure-button">Pause</button>
+  <button onclick = "reset()" id="reset" class="pure-button">Reset</button>
+  <button onclick = "toggleWeightedColors()" id="colors" class="pure-button">Enable Weighted Colors</button>
   Step Time (seconds): 0.1<input type="range" id="speed" min="100" max="1000">1
   <!-- Please keep script.js call at bottom of body tag -->
   <script type="text/javascript" src="script.js"></script>

@@ -5,20 +5,20 @@ var current;
 d3.json("quicksort.json", function(error, json) {
   if (error) return console.warn(error);
   dataset = json
+  console.log(dataset["snapshots"].length);
   current = -1;
   next(true);
 });
 
 // Dimension variables
-var box_size = {w: 50, h:50};
+var box_size = {w: 80, h:50};
 var array_padding = 8;
 var text_padding = {x: 8, y:8};
-var width = 1240;
-var height =250;
+var width = 500;
+var height = 250;
 var myInterval;
 
 // Color variables
-var highlightedColor = d3.rgb("rgb(180,180,180 )");
 var defaultColor = d3.rgb("rgb(135,206,235)");
 var orange = d3.rgb("rgb(250,198,85)");
 var textColor = d3.rgb("rgb(255,255,255)");
@@ -40,13 +40,18 @@ function visualise(num){
     switch (dataset.snapshots[num].type) {
       case "ARRAY":
         
+        // Set width of canvas dependent on size
+        d3.select("#canvas svg")
+          .attr("width", (array_padding + 
+              (dataset.snapshots[num].data.length * (box_size.w +array_padding))));
+        
         // Create SVG grouping element for each data item
         var elem = svg.selectAll("g")
             .data(dataset.snapshots[num].data)
             .enter().append("g")
             .attr("class", "array-node")
             .attr("transform", function(d, i) { 
-              return "translate(" + i * (box_size.w +array_padding) + "," + array_padding + ")"; 
+              return "translate(" + (array_padding + (i * (box_size.w +array_padding))) + "," + array_padding + ")"; 
             });
         
         // Set range for weighted colors
@@ -54,11 +59,14 @@ function visualise(num){
           range = getRange(dataset.snapshots[num].data);
         else
           range = [0,0]
-        
+          
         // Add main box to group
         elem.append("rect")
             .attr("width", box_size.w)
             .attr("height", box_size.h)
+            .attr("class", function(d){
+              return d.highlighted ? "highlighted" : null;
+            })
             .attr("fill", function(d) { 
               return getColor(d, range);
             });
@@ -70,6 +78,7 @@ function visualise(num){
             .attr("fill", textColor)
             .attr("text-anchor", "middle")
             .text(function(d) { return d.value; });
+        
       break;
       case "BINARY-TREE":
         
@@ -182,9 +191,9 @@ function getRange(data) {
 function toggleWeightedColors(){
   weightedColors = !weightedColors;
   if(weightedColors)
-    d3.select("#colors").text("Turn off weighted colors");
+    d3.select("#colors").text("Disable Weighted Colors");
   else
-    d3.select("#colors").text("Turn on weighted colors");
+    d3.select("#colors").text("Enable Weighted Colors");
   visualise(current);
 }
 
