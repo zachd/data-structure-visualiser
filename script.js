@@ -2,13 +2,16 @@ var dataset;
 var current;
 
 // Load JSON from file
-d3.json("quicksort.json", function(error, json) {
-  if (error) return console.warn(error);
-  dataset = json
-  d3.select("#snapshot-slider").attr("max", dataset["snapshots"].length - 1);
-  current = -1;
-  next(true);
-});
+function load(filename){
+  d3.json(filename, function(error, json) {
+    if (error) return console.warn(error);
+    dataset = json
+    d3.select("#snapshot-slider").attr("max",
+      dataset["snapshots"].length - 1);
+    current = -1;
+    next(true);
+  });
+}
 
 // Dimension variables
 var box_size = {w: 70, h:50};
@@ -105,14 +108,21 @@ function visualise(num){
         // Initialise tree nodes and links from data set
         var nodes = tree.nodes(dataset.snapshots[num].data),
           links = tree.links(nodes);
-
+        
+        // Set width of canvas dependent on size
+        d3.select("#canvas svg")
+          .attr("width", (array_padding + 
+              (nodes.length * (box_size.w + array_padding))));
+        tree.size([height, (array_padding + 
+              (nodes.length * (box_size.w + array_padding)))]);
+        
         // Create link elements from link array
         var link = treecontainer.selectAll("path.link")
           .data(links)
           .enter().append("path")
           .attr("class", "link")
           .attr("d", diagonal);
-        
+         
         // Create node elements from nodes array
         var node = treecontainer.selectAll("g.tree-node")
           .data(nodes)
