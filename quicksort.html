@@ -186,12 +186,12 @@
   <div id="controls">
     <button onclick = "reset()" id="reset" class="pure-button">Reset</button>
     <button onclick = "toggleWeightedColors()" id="colors" class="pure-button">Enable Weighted Colors</button>
-    <span class="speed-container">Speed: <span id="speed-value">500ms</span><input type="range" id="speed" min="50" max="1000" step="50" onchange="changeSpeed(this.value)"></span>
+    <span class="speed-container">Speed: <span id="speed-value">100ms</span><input type="range" id="speed" value="100" min="50" max="1000" step="50" onchange="changeSpeed(this.value)"></span>
   </div>
 </div>
-  <div class="small-link">[<a href="/quicksort.html" title="Quicksort Implementation">Go to Quicksort Example</a>]</div>
+  <div class="small-link">[<a href="/index.html" title="Default Implementation">Back to Default</a>]</div>
 <!-- Please keep script.js call at bottom of body tag -->
 <script type="text/javascript" src="script.js"></script>
-<script type="text/javascript">load("output.json");</script>
+<script type="text/javascript">load("quicksort.json");toggleWeightedColors();</script>
 </body>
 </html>
