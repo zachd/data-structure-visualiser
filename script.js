@@ -13,6 +13,11 @@ function load(filename){
   });
 }
 
+/* Max func: http://ejohn.org/blog/fast-javascript-maxmin/ */
+Array.max = function( array ){
+    return Math.max.apply( Math, array );
+};
+
 // Dimension variables
 var box_size = {w: 70, h:50};
 var array_padding = 8;
@@ -41,58 +46,78 @@ function visualise(num){
     // Remove all SVG elements from container
     svg.selectAll("*").remove();
     
+    // Snapshot variable
+    var snapshot = dataset.snapshots[num];
+  
     // Show snapshot number in corner
     d3.select("#snapshot-counter")
-      .text("snapshot: " + num);
+      .html("type: " + snapshot.type + "<Br />snapshot: " + num);
     
     // Update snapshot progress slider
     d3.select("#snapshot-slider").property("value", num);
   
     // Check if the snapshot is of type ARRAY
-    switch (dataset.snapshots[num].type) {
+    switch (snapshot.type) {
       case "ARRAY":
+      case "2D-ARRAY":
+        
+        // Get max array size
+        var firstd = snapshot.data.length;
+        var twoddata = snapshot.data.slice();
+        var secondd = (snapshot.type == "2D-ARRAY" ? twoddata.map(function(s){return s.length;}) : null);
+        
         
         // Set width of canvas dependent on size
         d3.select("#canvas svg")
           .attr("width", (array_padding + 
-              (dataset.snapshots[num].data.length * (box_size.w +array_padding))));
-        
-        // Create SVG grouping element for each data item
-        var elem = svg.selectAll("g")
-            .data(dataset.snapshots[num].data)
-            .enter().append("g")
-            .attr("class", "array-node")
-            .attr("transform", function(d, i) { 
-              return "translate(" + (array_padding + (i * (box_size.w +array_padding))) + "," + array_padding + ")"; 
-            });
-        
-        // Set range for weighted colors
-        if(weightedColors)
-          range = getRange(dataset.snapshots[num].data);
-        else
-          range = [0,0]
+              ((secondd ? Array.max(secondd) : firstd) * (box_size.w +array_padding))));
+                
+        // Set height of canvas dependent on 2D size
+        var twodheight = (array_padding + (firstd * (box_size.h + array_padding)));
+        d3.select("#canvas svg")
+          .attr("height", (secondd && twodheight > height ? twodheight : height));
+
+        for(var k = 0; k < (secondd ? firstd : 1); k++){
+          var data = (secondd ? snapshot.data[k] : snapshot.data);
           
-        // Add main box to group
-        elem.append("rect")
-            .attr("width", box_size.w)
-            .attr("height", box_size.h)
-            .attr("class", function(d){
-              return d.highlighted ? "highlighted" : null;
-            })
-            .attr("fill", function(d) { 
-              return getColor(d, range);
-            });
-        
-        // Add text to group
-        elem.append("text")
-            .attr("dy", box_size.h / 2 + array_padding)
-            .attr("dx", box_size.w / 2)
-            .attr("style", function(d){
-              return d.highlighted ? "font-weight: bold" : null;
-            })
-            .attr("fill", textColor)
-            .attr("text-anchor", "middle")
-            .text(function(d) { return d.value; });
+          // Create SVG grouping element for each data item
+          var elem = svg.selectAll(".array-node" + k)
+              .data(data)
+              .enter().append("g")
+              .attr("class", "array-node" + k + " array-node")
+              .attr("transform", function(d, i) { 
+                return "translate(" + (array_padding + (i * (box_size.w +array_padding)))
+                  + "," + (array_padding + (k * (box_size.h +array_padding))) + ")"; 
+              });
+
+          // Set range for weighted colors
+          if(weightedColors)
+            range = getRange(data);
+          else
+            range = [0,0]
+
+          // Add main box to group
+          elem.append("rect")
+              .attr("width", box_size.w)
+              .attr("height", box_size.h)
+              .attr("class", function(d){
+                return d.highlighted ? "highlighted" : null;
+              })
+              .attr("fill", function(d) { 
+                return getColor(d, range);
+              });
+
+          // Add text to group
+          elem.append("text")
+              .attr("dy", box_size.h / 2 + array_padding)
+              .attr("dx", box_size.w / 2)
+              .attr("style", function(d){
+                return d.highlighted ? "font-weight: bold" : null;
+              })
+              .attr("fill", textColor)
+              .attr("text-anchor", "middle")
+              .text(function(d) { return d.value; });
+        }
         
       break;
       case "BINARY-TREE":
@@ -106,7 +131,7 @@ function visualise(num){
           .attr("transform", "translate(40,0)");
         
         // Initialise tree nodes and links from data set
-        var nodes = tree.nodes(dataset.snapshots[num].data),
+        var nodes = tree.nodes(snapshot.data),
           links = tree.links(nodes);
         
         // Set width of canvas dependent on size

@@ -15,7 +15,7 @@ twodarray = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 0]];
 # Visualise both arrays
 visualiser.visualise(intarray);
 visualiser.visualise(stringarray);
-visualiser.visualise(twodarray);
+visualiser.visualise2d(twodarray);
 
 # Finish writing and flush output
 visualiser.end();

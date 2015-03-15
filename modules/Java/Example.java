@@ -17,7 +17,7 @@ public class Example {
 		// Visualise both arrays
 		visualiser.visualise(intarray);
 		visualiser.visualise(stringarray);
-		visualiser.visualise(twodarray);
+		visualiser.visualise2d(twodarray);
 		
 		// Finsh writing and flush output
 		visualiser.end();

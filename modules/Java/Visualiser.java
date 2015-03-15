@@ -47,7 +47,8 @@ public class Visualiser {
 	
 	/* 1D Arrays Visualiser */
 	public void visualise(Object array, int... highlightedIndices){
-		JSONObject obj = listToJSON(array, highlightedIndices);
+		JSONObject obj = new JSONObject();
+		obj.put("data", listToJSON(array, highlightedIndices));	
 		obj.put("type", "ARRAY");
 		snapshots.add(obj);
 	}
@@ -85,9 +86,8 @@ public class Visualiser {
 	}
 	
 	/* Helper function for all Array Visualisers */
-	private JSONObject listToJSON(Object array, int[] highlightedIndices){
+	private JSONArray listToJSON(Object array, int[] highlightedIndices){
 
-		JSONObject listObject = new JSONObject();
 		JSONArray data = new JSONArray();
 		for(int i = 0; i < Array.getLength(array); i++){
 			JSONObject element = new JSONObject();
@@ -96,8 +96,7 @@ public class Visualiser {
 			element.put("highlighted", contains(highlightedIndices, i));
 			data.add(element);
 		}
-		listObject.put("data", data);
-		return listObject;
+		return data;
 	}
 	
 	/* Helper function for all Array Visualisers */
